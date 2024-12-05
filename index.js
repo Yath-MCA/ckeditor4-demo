@@ -911,6 +911,14 @@ document.addEventListener("DOMContentLoaded", (event) => {
                     console.warn(err.message + NODE.innerHTML);
                 }
             },
+            isDisplatPresent: function() {
+                var self = PasteFilter;
+                try {
+                    return self.DOM.querySelectorAll("p,^h,ol,ul,div").length > 0;
+                } catch (error) {
+                    console.log(error.message);
+                }
+            },
             after_append_remove: function(el, canAddSpace, options = {}) {
                 var self = this;
                 // Destructure options with default values
@@ -921,6 +929,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
                         center = false
                 } = options;
                 try {
+
                     // New parameters
                     const Parent = el.parentElement;
                     if (!Parent) return;
@@ -930,10 +939,10 @@ document.addEventListener("DOMContentLoaded", (event) => {
                     const isFormat = this.formatTagArr.includes(el.tagName);
                     const isAnchor = /^(A)$/i.test(el.tagName);
 
-                    const canConvertPara = begin && !remove && !isFormat && !isAnchor;
+                    const canConvertPara = begin && !remove && !isFormat && !isAnchor && !self.isDisplatPresent();
 
                     if (canConvertPara) {
-                        console.log("==001==")
+                        console.log("= p created by function==")
                         const pElement = document.createElement('p');
 
                         if (!Parent.classList.contains("paste-filter")) {
@@ -988,12 +997,12 @@ document.addEventListener("DOMContentLoaded", (event) => {
                     reverArr.forEach((node, ind, Arr) => {
                         if (!node) return;
                         if ([7, 4, 8, 10].includes(node.nodeType) || node.nodeType == 1 && _.remove_elm_tags.includes(node.tagName.toLocaleLowerCase())) {
-                            // node.parentElement.removeChild(node);
+
                             PasteFilter.removeEl(node);
                         } else if (node.nodeType == 3) {
                             let trim = node.nodeValue.trim();
                             if (['' /* , ' ', '\\n', '\\n\\n' */ ].includes(trim) || trim.length == 0) {
-                                // node.parentElement.removeChild(node);
+
                                 PasteFilter.removeEl(node);
                             } else _.check_NSNB(node);
                         } else if (node.nodeType == 1) {
@@ -1063,7 +1072,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
                 try {
                     // ! LOOP START
                     let tag = el.tagName.toLocaleLowerCase();
-                    // if (el.childNodes) _.LoopMethod(el);
+
                     // ! LOOP END
                     if (/^INSERT|^DIV|^DEL|^SPAN/gi.test(el.tagName)) {
                         // ? In -house Tags
@@ -1119,7 +1128,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
                                     if (Parent && el.attributes.length == 0) {
                                         console.log("remove_span")
                                         _.after_append_remove(el, true, {
-                                            begin: !0
+                                            begin: !1
                                         });
 
                                     }
@@ -1536,10 +1545,18 @@ document.addEventListener("DOMContentLoaded", (event) => {
                 })
 
                 var frag = document.createRange().createContextualFragment(filter);
-                var el = document.createElement("div")
-                el.id = idx;
-                el.append(frag);
-                outDiv.append(el);
+                // var el = document.createElement("div")
+                // el.id = idx;
+                // el.append(frag);
+                // outDiv.append(el);
+
+                var ck_el = CKEDITOR.document.createElement("span");
+                var body_ck = CKEDITOR.instances.editor1.document.getBody();
+                var last = body_ck.getLast();
+                last.$.after(frag);
+                // ck_el.setHtml(filter);
+                // ck_el.setAttribute("id", idx);
+                // ck_el.insertAfter(body_ck.getLast());
 
             })
         }
@@ -1556,29 +1573,44 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
             if (this.id == "out-reset") {
 
+
+
             } else if (this.id == "out-clear") {
 
-            } else if (this.id == "in-reset") {} else if (this.id == "in-clear") {
+            } else if (this.id == "in-reset") {
 
+            } else if (this.id == "in-clear") {
+
+
+            } else if (this.id == "in-array-data") {
+                demoFun();
 
             }
 
         });
+
+        function get_p_Data_(data, evt) {
+
+
+            var dataOne = iGetFragment(data ? data : evt.data.dataValue, {
+                tag: 'span'
+            }).innerHTML;
+
+            return newValue = PasteFilter.fire(dataOne, {
+                event_from: 'shortcut',
+                e: evt
+            });
+        }
         document.addEventListener('DOMContentLoaded', function(event) {
             CKEDITOR.on('instanceReady', function(ev) {
 
                 ev.editor.on('paste', function(evt) {
                     console.log("===paste==")
-                    let IsHTMLPaste = evt.data.dataTransfer._.data['text/html'],
-                        data = iGetFragment(IsHTMLPaste ? IsHTMLPaste : evt.data.dataValue, {
-                            tag: 'span'
-                        }).innerHTML,
-                        newValue = PasteFilter.fire(data, {
-                            event_from: 'shortcut',
-                            e: evt
-                        });
+                    let IsHTMLPaste = evt.data.dataTransfer._.data['text/html'];
+                    let newValue = get_p_Data_(IsHTMLPaste, evt);
                     evt.data.dataValue = (newValue);
                 })
             })
         })
+    
 });
