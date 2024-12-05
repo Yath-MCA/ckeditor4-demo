@@ -1,19 +1,4 @@
- CKEDITOR.replace('editor1', {
-            removeFormatAttributes: 'valign',
-            allowedContent: true,
-            extraAllowedContent: '*(*)[*]{*}',
-            shiftEnterMode: CKEDITOR.ENTER_BR,
-            autoParagraph: false,
-            ignoreEmptyParagraph: false,
-            entities: false,
-            entities_greek: false,
-            entities_latin: false,
-            htmlEncodeOutput: false,
-            entities_processNumerical: true,
-            entities_processNumerical: 'force',
-            tabSpaces: 4,
-            fillEmptyBlocks: false
-        });
+
         window.iGetFragment = (_String, Options = {}) => {
 
             try {
